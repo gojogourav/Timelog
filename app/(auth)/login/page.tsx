@@ -15,11 +15,9 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const response = await fetch('/api/sign-in', {
+      const response = await fetch('/api/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        
         body: JSON.stringify({ username, password }),
       })
 
@@ -38,12 +36,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-black">
       <form 
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-md w-96"
+        className="bg-neutral-900 p-8 rounded-lg shadow-md w-96"
       >
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+        <h2 className="text-2xl font-bold mb-6 text-center text-white">
           Welcome Back
         </h2>
 
@@ -54,28 +52,28 @@ export default function LoginPage() {
         )}
 
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-semibold mb-2">
+          <label className="block text-white text-sm font-semibold mb-2">
             Username
           </label>
           <input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded-md focus:outline-none text-black focus:ring-2 focus:ring-blue-500"
             placeholder="Enter your username"
             required
           />
         </div>
 
         <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-semibold mb-2">
+          <label className="block text-white text-sm font-semibold mb-2">
             Password
           </label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded-md focus:outline-none text-black focus:ring-2 focus:ring-blue-500"
             placeholder="Enter your password"
             required
           />
@@ -89,7 +87,7 @@ export default function LoginPage() {
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
 
-        <div className="mt-4 text-center text-sm text-gray-600">
+        <div className="mt-4 text-center text-sm text-white">
           Don't have an account?{' '}
           <a 
             href="/register" 
