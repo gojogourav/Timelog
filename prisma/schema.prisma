@@ -50,8 +50,7 @@ model TimeLog {
   activity     Activity @relation(fields: [activityId], references: [id])
   activityId   String
   id           String   @id @default(uuid())
-  startTime    DateTime
-  endTime      DateTime
+  sessionTime  Int
   notes        String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
