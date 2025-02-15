@@ -1,21 +1,30 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { cookies } from "next/headers";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import jwt from 'jsonwebtoken'
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient()
 
-export default async function POST(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(req: NextRequest) {
     try {
         const accessToken = (await cookies()).get('access_token')?.value
         if (!accessToken) {
-            return res.status(401).json({ error: "Unauthorized" });
+            return NextResponse.json({ error: "Unauthorized" },{status:401});
           }      
+
+          if (!process.env.JWT_ACCESS_SECRET) {
+            console.error("JWT_ACCESS_SECRET is not defined in the environment.");
+            return NextResponse.json(
+              { error: "Server configuration error" },
+              { status: 500 }
+            );
+          }
+      
         
-        const decoded = jwt.verify(
+        const decoded = await jwt.verify(
             accessToken,
-            process.env.JWT_REFRESH_SECRET!,
+            process.env.JWT_ACCESS_SECRET!,
         ) as jwt.JwtPayload
 
         const user = await prisma.user.findUnique({
@@ -24,39 +33,51 @@ export default async function POST(req: NextApiRequest, res: NextApiResponse) {
             }
         })
 
-
-
-        const { userId,
+        const { 
             description,
             activityTitle,
-
-
-        } = await req.body()
+            Activityphoto, 
+            isPrivate
+        } = await req.json()
 
         if(!activityTitle){
-            return res.status(401).json({error:"Please activity must have some title"})
+    return NextResponse.json({error:"Please activity must have some title"},{status:401})
         }
 
-        if (!user || !(userId === decoded.userId)) {
-            return res.json({ error: "Failed to authenticate user" })
+        if (!user ) {
+            return NextResponse
+            .json({ error: "Failed to authenticate user" },{status:402})
         }
 
         const newActivity = await prisma.activity.create({
             data: {
                 userId:decoded.userId,
-                creator:decoded.userId,
                 description,
                 activityTitle,
-                private:true,
-
+                private:isPrivate,
+                Activityphoto
             }
         })
 
 
-        return res.status(200).json({ newActivity })
+        return NextResponse.json({ newActivity },{status:200})
     } catch (error) {
-        console.error("Error creating session:", error);
-        return res.status(500).json({ error: "Internal server error" });
+        console.log("Error creating session:", error);
+        if (error instanceof jwt.TokenExpiredError) {
+            return NextResponse.json(
+              { error: "Session expired" },
+              { status: 401 }
+            );
+          }
+      
+          if (error instanceof jwt.JsonWebTokenError) {
+            return NextResponse.json(
+              { error: "Invalid token" },
+              { status: 401 }
+            );
+          }
+        
+        return NextResponse.json({ error },{status:500});
     }
 
 }
