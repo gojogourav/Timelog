@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
             data: {
                 userId:decoded.userId,
                 description,
-                activityTitle,
+                activityTitle:activityTitle,
                 private:isPrivate,
                 Activityphoto
             }
